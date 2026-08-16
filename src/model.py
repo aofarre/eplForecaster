@@ -244,16 +244,17 @@ def _fit_dc_mle(matches, weights, teams, initial_params=None):
     n = len(teams)
     team_idx = {t: i for i, t in enumerate(teams)}
 
-    # Parameter layout: [attack_1..N-1, defence_0..N-1, home_adv, rho]
+    # Parameter vector has 2n+1 elements:
+    #   [attack_1..N-1 (n-1), defence_0..N-1 (n), home_adv (1), rho (1)]
     # attack[0] is the reference team, fixed at 0 for identifiability.
     def unpack(x):
         atk = np.zeros(n); atk[1:] = x[:n-1]
         def_ = x[n-1:2*n-1]
         return atk, def_, x[-2], x[-1]
 
-    x0 = np.zeros(2 * n)
+    x0 = np.zeros(2 * n + 1)
     if initial_params:
-        for i, t in enumerate(teams[1:]): 
+        for i, t in enumerate(teams[1:]):
             if t in initial_params: x0[i] = initial_params[t].attack
         for i, t in enumerate(teams):
             if t in initial_params: x0[n-1+i] = initial_params[t].defence

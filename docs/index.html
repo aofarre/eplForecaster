@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EPL Forecaster 2026/27</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      min-height: 100vh;
+      padding: 24px 16px 48px;
+    }
+
+    header {
+      max-width: 1100px;
+      margin: 0 auto 24px;
+    }
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    header h1 span.badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: #1f6feb;
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 12px;
+      letter-spacing: 0.03em;
+    }
+    .meta {
+      margin-top: 6px;
+      font-size: 0.82rem;
+      color: #8b949e;
+    }
+    .meta strong { color: #c9d1d9; }
+
+    /* Zone legend */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      max-width: 1100px;
+      margin: 0 auto 16px;
+      font-size: 0.78rem;
+      color: #8b949e;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .table-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+      white-space: nowrap;
+    }
+
+    thead th {
+      padding: 8px 10px;
+      text-align: right;
+      font-weight: 600;
+      font-size: 0.75rem;
+      color: #8b949e;
+      border-bottom: 1px solid #21262d;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    thead th.left { text-align: left; }
+    thead th.center { text-align: center; }
+
+    tbody tr {
+      border-bottom: 1px solid #161b22;
+      transition: background 0.1s;
+    }
+    tbody tr:hover { background: #161b22; }
+
+    td {
+      padding: 9px 10px;
+      text-align: right;
+      color: #c9d1d9;
+    }
+    td.left { text-align: left; }
+    td.center { text-align: center; }
+    td.team-name { font-weight: 600; color: #e6edf3; }
+    td.dim { color: #6e7681; }
+
+    /* Zone accent bar on the left */
+    td.zone-bar {
+      padding: 0;
+      width: 4px;
+      min-width: 4px;
+    }
+
+    /* Probability bar cells */
+    .prob-bar-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+    .prob-bar-bg {
+      width: 60px;
+      height: 6px;
+      background: #21262d;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .prob-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+    }
+    .prob-val { min-width: 38px; text-align: right; font-variant-numeric: tabular-nums; }
+
+    /* Rank confidence range */
+    .rank-range {
+      font-size: 0.75rem;
+      color: #6e7681;
+    }
+
+    /* Dividers between table sections */
+    tr.section-divider td {
+      border-top: 2px solid #21262d;
+    }
+
+    /* Zone colours */
+    .z-ucl   { background: #1f6feb; }
+    .z-uel   { background: #f78166; }
+    .z-conf  { background: #a5d6ff; }
+    .z-rel   { background: #da3633; }
+
+    .text-ucl   { color: #79c0ff; }
+    .text-uel   { color: #f78166; }
+    .text-conf  { color: #a5d6ff; }
+    .text-rel   { color: #f85149; }
+
+    .loading {
+      text-align: center;
+      padding: 60px;
+      color: #6e7681;
+      font-size: 1rem;
+    }
+    .error {
+      text-align: center;
+      padding: 40px;
+      color: #f85149;
+    }
+
+    footer {
+      max-width: 1100px;
+      margin: 32px auto 0;
+      font-size: 0.75rem;
+      color: #6e7681;
+      text-align: center;
+    }
+    footer a { color: #58a6ff; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>⚽ EPL Forecaster <span class="badge" id="season-badge">2026/27</span></h1>
+  <p class="meta" id="meta-line">Loading…</p>
+</header>
+
+<div class="legend">
+  <span class="legend-item"><span class="legend-dot z-ucl"></span>Champions League (top 4)</span>
+  <span class="legend-item"><span class="legend-dot z-uel"></span>Europa League (5–6)</span>
+  <span class="legend-item"><span class="legend-dot" style="background:#d2a679"></span>Conference League (7)</span>
+  <span class="legend-item"><span class="legend-dot z-rel"></span>Relegation (bottom 3)</span>
+</div>
+
+<div class="table-wrap">
+  <div class="loading" id="loading">Loading forecast data…</div>
+  <table id="main-table" style="display:none">
+    <thead>
+      <tr>
+        <th style="width:4px"></th>
+        <th class="left center" style="width:32px">#</th>
+        <th class="left">Team</th>
+        <th title="Played">P</th>
+        <th title="Won">W</th>
+        <th title="Drawn">D</th>
+        <th title="Lost">L</th>
+        <th title="Goal difference">GD</th>
+        <th title="Points">Pts</th>
+        <th title="Projected final rank">Proj rank</th>
+        <th title="80% confidence interval on final rank">Rank range</th>
+        <th title="Probability of winning the title">Title</th>
+        <th title="Probability of finishing top 4 (Champions League)">Top 4</th>
+        <th title="Probability of finishing top 6 (Europa League)">Top 6</th>
+        <th title="Probability of relegation">Rel</th>
+      </tr>
+    </thead>
+    <tbody id="table-body"></tbody>
+  </table>
+</div>
+
+<footer>
+  Model: Dixon-Coles Poisson regression blended with pre-season prior ·
+  Data: <a href="https://www.football-data.co.uk" target="_blank">football-data.co.uk</a>,
+  <a href="https://www.transfermarkt.com" target="_blank">Transfermarkt</a> ·
+  <a href="https://github.com/aofarre/eplForecaster" target="_blank">Source on GitHub</a>
+</footer>
+
+<script>
+const DATA_URL = "data.json";
+
+function zone(projRank) {
+  if (projRank <= 4)  return "ucl";
+  if (projRank <= 6)  return "uel";
+  if (projRank === 7) return "conf";
+  if (projRank >= 18) return "rel";
+  return null;
+}
+
+function probBar(pct, colorClass) {
+  const fill = Math.min(pct, 100);
+  return `<div class="prob-bar-wrap">
+    <div class="prob-bar-bg"><div class="prob-bar-fill ${colorClass}" style="width:${fill}%"></div></div>
+    <span class="prob-val">${pct.toFixed(1)}%</span>
+  </div>`;
+}
+
+function fmt(val, fallback = "–") {
+  return val == null ? fallback : val;
+}
+
+function fmtGD(val) {
+  if (val == null) return "–";
+  return val > 0 ? `+${val}` : `${val}`;
+}
+
+async function load() {
+  try {
+    const resp = await fetch(DATA_URL + "?_=" + Date.now());
+    if (!resp.ok) throw new Error(resp.statusText);
+    const data = await resp.json();
+    render(data);
+  } catch (e) {
+    document.getElementById("loading").innerHTML =
+      `<div class="error">⚠ Could not load forecast data.<br><small>${e.message}</small></div>`;
+  }
+}
+
+function render(data) {
+  document.getElementById("season-badge").textContent = data.season || "2026/27";
+  document.getElementById("meta-line").innerHTML =
+    `<strong>${data.blend_label}</strong> &nbsp;·&nbsp; Updated ${formatAge(data.updated_at)}`;
+
+  const tbody = document.getElementById("table-body");
+  tbody.innerHTML = "";
+
+  const teams = data.teams || [];
+  let prevZone = null;
+
+  teams.forEach((t, idx) => {
+    const pos = idx + 1;
+    const z = zone(t.proj_rank);
+    const tr = document.createElement("tr");
+
+    // Section divider at relegation boundary
+    if (pos === 18 && prevZone !== "rel") tr.classList.add("section-divider");
+    if (pos === 5  && prevZone === "ucl") tr.classList.add("section-divider");
+    prevZone = z;
+
+    const zColor = z ? `z-${z}` : "";
+    const textClass = z ? `text-${z}` : "";
+
+    tr.innerHTML = `
+      <td class="zone-bar"><div style="height:100%;min-height:36px;background:${z ? `var(--z-${z},${zDot(z)})` : "transparent"}"></div></td>
+      <td class="center dim">${pos}</td>
+      <td class="left team-name ${textClass}">${t.team}</td>
+      <td>${fmt(t.played, 0)}</td>
+      <td>${fmt(t.won, 0)}</td>
+      <td>${fmt(t.drawn, 0)}</td>
+      <td>${fmt(t.lost, 0)}</td>
+      <td>${fmtGD(t.gd)}</td>
+      <td><strong>${fmt(t.points, 0)}</strong></td>
+      <td><strong>${t.proj_rank}</strong></td>
+      <td class="rank-range">${t.rank_p10}–${t.rank_p90}</td>
+      <td>${probBar(t.p_title,      "z-ucl")}</td>
+      <td>${probBar(t.p_top4,       "z-ucl")}</td>
+      <td>${probBar(t.p_top6,       "z-uel")}</td>
+      <td>${probBar(t.p_relegation, "z-rel")}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById("loading").style.display = "none";
+  document.getElementById("main-table").style.display = "table";
+}
+
+function zDot(z) {
+  return {ucl:"#1f6feb", uel:"#f78166", conf:"#a5d6ff", rel:"#da3633"}[z] || "transparent";
+}
+
+function formatAge(iso) {
+  if (!iso) return "unknown";
+  const ago = Math.round((Date.now() - new Date(iso)) / 60000);
+  if (ago < 2)   return "just now";
+  if (ago < 60)  return `${ago} min ago`;
+  if (ago < 1440) return `${Math.round(ago/60)}h ago`;
+  return `${Math.round(ago/1440)}d ago`;
+}
+
+load();
+</script>
+</body>
+</html>

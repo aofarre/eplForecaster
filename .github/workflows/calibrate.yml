@@ -1,0 +1,77 @@
+name: Calibrate Hyperparameters
+
+on:
+  workflow_dispatch:
+    inputs:
+      eval_seasons:
+        description: "Space-separated eval seasons (e.g. '2023/24 2024/25 2025/26')"
+        required: false
+        default: "2023/24 2024/25 2025/26"
+      sims:
+        description: "Simulations per evaluation (2000=fast, 5000=good, 10000=best)"
+        required: false
+        default: "2000"
+
+jobs:
+  calibrate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Restore DB cache
+        id: cache-db
+        uses: actions/cache@v4
+        with:
+          path: data/epl.db
+          key: epl-db-history-v1
+
+      - name: Initialise DB
+        if: steps.cache-db.outputs.cache-hit != 'true'
+        working-directory: src
+        run: python cli.py init
+
+      - name: Load historical data
+        if: steps.cache-db.outputs.cache-hit != 'true'
+        working-directory: src
+        run: python cli.py load-history
+
+      - name: Run calibration
+        working-directory: src
+        run: |
+          SEASONS="${{ github.event.inputs.eval_seasons }}"
+          SIMS="${{ github.event.inputs.sims }}"
+          # Convert space-separated seasons to CLI args
+          python cli.py calibrate \
+            --seasons $SEASONS \
+            --sims $SIMS \
+            --top-n 20 \
+            2>&1 | tee ../calibration_output.txt
+
+      - name: Write job summary
+        run: |
+          echo "## Calibration Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Eval seasons:** ${{ github.event.inputs.eval_seasons }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Simulations:** ${{ github.event.inputs.sims }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat calibration_output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload full output
+        uses: actions/upload-artifact@v4
+        with:
+          name: calibration-results
+          path: calibration_output.txt
+          retention-days: 30

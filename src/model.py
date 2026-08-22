@@ -71,14 +71,13 @@ BLEND_ALPHA_MAX = 0.80  # max current-season weight; pedigree floor = 20% (calib
 XI_PRIOR        = 0.002  # time-decay for prior-season MLE fitting (calibrated)
 XI_CURRENT      = 0.010  # time-decay for current-season MLE fitting (calibrated)
 
-TRANSFER_K = 0.08  # log-scale adjustment per unit of log(squad_value/avg)
-               # Conservative — transfer spend is a weak within-season signal
+TRANSFER_K = 0.20  # log-scale adjustment; spend spread (Chelsea £440m vs Sunderland £32m)
+               # is meaningful enough to drive ~0.2 log-units of attack differential
 
 # After fitting the prior DC-MLE, shrink all team params toward zero by this
-# fraction.  1.0 = no shrinkage; 0.6 = 40% reversion to league mean.
-# Shrinkage prevents the model from over-concentrating title probability on
-# the most recent champions — betting markets imply ~40% for Arsenal, not 65%+.
-PRIOR_SHRINKAGE = 0.70
+# fraction.  1.0 = no shrinkage; 0.55 = 45% reversion to league mean.
+# Target: Arsenal ~40-45% title probability to match current betting market.
+PRIOR_SHRINKAGE = 0.55
 
 # Promoted team attack/defence offsets from bottom-5 EPL average (log-scale).
 # Historically, no promoted team has finished top-4 in the modern CL era (since 2001).

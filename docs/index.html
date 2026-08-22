@@ -81,9 +81,20 @@
       border-bottom: 1px solid #21262d;
       letter-spacing: 0.04em;
       text-transform: uppercase;
+      white-space: nowrap;
     }
     thead th.left { text-align: left; }
     thead th.center { text-align: center; }
+
+    thead th.sortable {
+      cursor: pointer;
+      user-select: none;
+    }
+    thead th.sortable:hover { color: #c9d1d9; }
+    thead th.sort-asc::after  { content: " ▲"; font-size: 0.65rem; color: #58a6ff; }
+    thead th.sort-desc::after { content: " ▼"; font-size: 0.65rem; color: #58a6ff; }
+    thead th.sort-asc,
+    thead th.sort-desc { color: #e6edf3; }
 
     tbody tr {
       border-bottom: 1px solid #161b22;
@@ -193,20 +204,20 @@
     <thead>
       <tr>
         <th style="width:4px"></th>
-        <th class="left center" style="width:32px">#</th>
-        <th class="left">Team</th>
-        <th title="Played">P</th>
-        <th title="Won">W</th>
-        <th title="Drawn">D</th>
-        <th title="Lost">L</th>
-        <th title="Goal difference">GD</th>
-        <th title="Points">Pts</th>
-        <th title="Projected final rank">Proj rank</th>
+        <th class="center" style="width:32px">#</th>
+        <th class="left sortable" data-col="team" data-type="str">Team</th>
+        <th class="sortable" data-col="played"  data-type="num" title="Played">P</th>
+        <th class="sortable" data-col="won"     data-type="num" title="Won">W</th>
+        <th class="sortable" data-col="drawn"   data-type="num" title="Drawn">D</th>
+        <th class="sortable" data-col="lost"    data-type="num" title="Lost">L</th>
+        <th class="sortable" data-col="gd"      data-type="num" title="Goal difference">GD</th>
+        <th class="sortable" data-col="points"  data-type="num" title="Points">Pts</th>
+        <th class="sortable sort-asc" data-col="proj_rank" data-type="num" title="Projected final rank">Proj rank</th>
         <th title="80% confidence interval on final rank">Rank range</th>
-        <th title="Probability of winning the title">Title</th>
-        <th title="Probability of finishing top 4 (Champions League)">Top 4</th>
-        <th title="Probability of finishing top 6 (Europa League)">Top 6</th>
-        <th title="Probability of relegation">Rel</th>
+        <th class="sortable" data-col="p_title"      data-type="num" title="Probability of winning the title">Title</th>
+        <th class="sortable" data-col="p_top4"        data-type="num" title="Probability of finishing top 4 (Champions League)">Top 4</th>
+        <th class="sortable" data-col="p_top6"        data-type="num" title="Probability of finishing top 6 (Europa League)">Top 6</th>
+        <th class="sortable" data-col="p_relegation"  data-type="num" title="Probability of relegation">Rel</th>
       </tr>
     </thead>
     <tbody id="table-body"></tbody>
@@ -222,6 +233,11 @@
 
 <script>
 const DATA_URL = "data.json";
+
+// Sort state
+let sortCol = "proj_rank";
+let sortDir = 1;   // 1 = asc, -1 = desc
+let allTeams = [];
 
 function zone(projRank) {
   if (projRank <= 4)  return "ucl";
@@ -248,44 +264,44 @@ function fmtGD(val) {
   return val > 0 ? `+${val}` : `${val}`;
 }
 
-async function load() {
-  try {
-    const resp = await fetch(DATA_URL + "?_=" + Date.now());
-    if (!resp.ok) throw new Error(resp.statusText);
-    const data = await resp.json();
-    render(data);
-  } catch (e) {
-    document.getElementById("loading").innerHTML =
-      `<div class="error">⚠ Could not load forecast data.<br><small>${e.message}</small></div>`;
-  }
+function zDot(z) {
+  return {ucl:"#1f6feb", uel:"#f78166", conf:"#a5d6ff", rel:"#da3633"}[z] || "transparent";
 }
 
-function render(data) {
-  document.getElementById("season-badge").textContent = data.season || "2026/27";
-  document.getElementById("meta-line").innerHTML =
-    `<strong>${data.blend_label}</strong> &nbsp;·&nbsp; Updated ${formatAge(data.updated_at)}`;
+function formatAge(iso) {
+  if (!iso) return "unknown";
+  const ago = Math.round((Date.now() - new Date(iso)) / 60000);
+  if (ago < 2)    return "just now";
+  if (ago < 60)   return `${ago} min ago`;
+  if (ago < 1440) return `${Math.round(ago/60)}h ago`;
+  return `${Math.round(ago/1440)}d ago`;
+}
 
+function sortTeams(teams, col, dir) {
+  return [...teams].sort((a, b) => {
+    let va = a[col], vb = b[col];
+    // nulls always last
+    if (va == null && vb == null) return 0;
+    if (va == null) return 1;
+    if (vb == null) return -1;
+    if (typeof va === "string") return dir * va.localeCompare(vb);
+    return dir * (va - vb);
+  });
+}
+
+function renderTable() {
+  const sorted = sortTeams(allTeams, sortCol, sortDir);
   const tbody = document.getElementById("table-body");
   tbody.innerHTML = "";
 
-  const teams = data.teams || [];
-  let prevZone = null;
-
-  teams.forEach((t, idx) => {
+  sorted.forEach((t, idx) => {
     const pos = idx + 1;
     const z = zone(t.proj_rank);
     const tr = document.createElement("tr");
-
-    // Section divider at relegation boundary
-    if (pos === 18 && prevZone !== "rel") tr.classList.add("section-divider");
-    if (pos === 5  && prevZone === "ucl") tr.classList.add("section-divider");
-    prevZone = z;
-
-    const zColor = z ? `z-${z}` : "";
     const textClass = z ? `text-${z}` : "";
 
     tr.innerHTML = `
-      <td class="zone-bar"><div style="height:100%;min-height:36px;background:${z ? `var(--z-${z},${zDot(z)})` : "transparent"}"></div></td>
+      <td class="zone-bar"><div style="height:100%;min-height:36px;background:${z ? zDot(z) : "transparent"}"></div></td>
       <td class="center dim">${pos}</td>
       <td class="left team-name ${textClass}">${t.team}</td>
       <td>${fmt(t.played, 0)}</td>
@@ -304,21 +320,53 @@ function render(data) {
     tbody.appendChild(tr);
   });
 
-  document.getElementById("loading").style.display = "none";
-  document.getElementById("main-table").style.display = "table";
+  // Update header indicators
+  document.querySelectorAll("thead th.sortable").forEach(th => {
+    th.classList.remove("sort-asc", "sort-desc");
+    if (th.dataset.col === sortCol) {
+      th.classList.add(sortDir === 1 ? "sort-asc" : "sort-desc");
+    }
+  });
 }
 
-function zDot(z) {
-  return {ucl:"#1f6feb", uel:"#f78166", conf:"#a5d6ff", rel:"#da3633"}[z] || "transparent";
-}
+async function load() {
+  try {
+    const resp = await fetch(DATA_URL + "?_=" + Date.now());
+    if (!resp.ok) throw new Error(resp.statusText);
+    const data = await resp.json();
 
-function formatAge(iso) {
-  if (!iso) return "unknown";
-  const ago = Math.round((Date.now() - new Date(iso)) / 60000);
-  if (ago < 2)   return "just now";
-  if (ago < 60)  return `${ago} min ago`;
-  if (ago < 1440) return `${Math.round(ago/60)}h ago`;
-  return `${Math.round(ago/1440)}d ago`;
+    document.getElementById("season-badge").textContent = data.season || "2026/27";
+    document.getElementById("meta-line").innerHTML =
+      `<strong>${data.blend_label}</strong> &nbsp;·&nbsp; Updated ${formatAge(data.updated_at)}`;
+
+    allTeams = data.teams || [];
+
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("main-table").style.display = "table";
+
+    renderTable();
+
+    // Wire up sortable headers
+    document.querySelectorAll("thead th.sortable").forEach(th => {
+      th.addEventListener("click", () => {
+        const col = th.dataset.col;
+        if (sortCol === col) {
+          sortDir *= -1;
+        } else {
+          sortCol = col;
+          // Probabilities and wins/pts: default desc (highest first)
+          // Rank, lost: default asc (lowest first)
+          const ascDefault = ["proj_rank", "lost", "team"].includes(col);
+          sortDir = ascDefault ? 1 : -1;
+        }
+        renderTable();
+      });
+    });
+
+  } catch (e) {
+    document.getElementById("loading").innerHTML =
+      `<div class="error">⚠ Could not load forecast data.<br><small>${e.message}</small></div>`;
+  }
 }
 
 load();

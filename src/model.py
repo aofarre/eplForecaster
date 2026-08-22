@@ -74,6 +74,12 @@ XI_CURRENT      = 0.010  # time-decay for current-season MLE fitting (calibrated
 TRANSFER_K = 0.08  # log-scale adjustment per unit of log(squad_value/avg)
                # Conservative — transfer spend is a weak within-season signal
 
+# After fitting the prior DC-MLE, shrink all team params toward zero by this
+# fraction.  1.0 = no shrinkage; 0.6 = 40% reversion to league mean.
+# Shrinkage prevents the model from over-concentrating title probability on
+# the most recent champions — betting markets imply ~40% for Arsenal, not 65%+.
+PRIOR_SHRINKAGE = 0.70
+
 # Promoted team attack/defence offsets from bottom-5 EPL average (log-scale).
 # Historically, no promoted team has finished top-4 in the modern CL era (since 2001).
 # Typical outcomes: champions ~14th, runners-up ~15th, playoff ~17th.
@@ -468,6 +474,12 @@ class PreSeasonForecaster:
         self.team_params, self.home_advantage, self.rho = _fit_dc_mle(
             ret_matches, ret_weights, returning)
         print(f"  home_advantage={self.home_advantage:.3f}  rho={self.rho:.3f}")
+
+        # Shrink all team params toward zero (league average) to avoid
+        # over-concentrating probability on recent champions.
+        for p in self.team_params.values():
+            p.attack  *= PRIOR_SHRINKAGE
+            p.defence *= PRIOR_SHRINKAGE
 
         # Promoted team baselines
         bottom5 = sorted(self.team_params.values(), key=lambda p: p.attack)[:5]

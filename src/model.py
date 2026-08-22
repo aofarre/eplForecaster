@@ -73,11 +73,19 @@ XI_CURRENT      = 0.010  # time-decay for current-season MLE fitting (calibrated
 
 TRANSFER_K = 0.10
 
+# Promoted team attack/defence offsets from bottom-5 EPL average (log-scale).
+# Historically, no promoted team has finished top-4 in the modern CL era (since 2001).
+# Typical outcomes: champions ~14th, runners-up ~15th, playoff ~17th.
+# These offsets must be negative enough to reflect that gulf vs established EPL sides.
 PROMOTED_OFFSET = {
-    "champions":  -0.10,
-    "runners_up": -0.20,
-    "playoff":    -0.30,
+    "champions":  -0.35,   # championship winners: typically finish ~14th
+    "runners_up": -0.45,   # runners-up: typically ~15-16th
+    "playoff":    -0.55,   # playoff winners: typically ~16-18th
 }
+# After transfer adjustment, cap promoted teams so they can't exceed the
+# attack strength of the 8th-best returning team (i.e. they can't be projected
+# top-half purely from squad value data which may be stale/overrated).
+PROMOTED_ATTACK_CAP_RANK = 8  # cannot exceed the Nth-best returning team's attack
 
 # -- Blend weight -------------------------------------------------------------
 
@@ -482,6 +490,22 @@ class PreSeasonForecaster:
                 print("  [transfers] No squad values -- run: python src/cli.py fetch-values")
         except Exception as e:
             print(f"  [transfers] Skipped: {e}")
+
+        # Cap promoted teams: they cannot be rated stronger than the Nth-best
+        # returning side.  This prevents a single big win or stale transfer data
+        # from pushing a newly promoted club into a top-4 projection.
+        returning_attacks = sorted(
+            [p.attack for t, p in self.team_params.items() if t not in self.promoted_teams],
+            reverse=True
+        )
+        if len(returning_attacks) >= PROMOTED_ATTACK_CAP_RANK:
+            cap_attack = returning_attacks[PROMOTED_ATTACK_CAP_RANK - 1]
+            for team in self.promoted_teams:
+                if team in self.team_params:
+                    p = self.team_params[team]
+                    if p.attack > cap_attack:
+                        print(f"  [cap] {team}: attack capped {p.attack:+.3f} → {cap_attack:+.3f}")
+                        p.attack = cap_attack
 
         print("[pre-season] Strength estimates:")
         for p in sorted(self.team_params.values(), key=lambda x: -x.attack):

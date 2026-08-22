@@ -593,6 +593,17 @@ class InSeasonForecaster:
             self.blended_params = dict(self.prior_params)
             return self
 
+        # Don't attempt in-season MLE until we have at least 5 matches per team
+        # on average — with fewer data points the MLE is too noisy and can push
+        # promoted/lucky-start teams to absurd projected positions.
+        n_teams = len({m["home_team"] for m in self._played+self._remaining} |
+                      {m["away_team"] for m in self._played+self._remaining})
+        min_matches_for_mle = max(n_teams // 2, 5)   # ~half a full matchday set
+        if len(self._played) < min_matches_for_mle:
+            print(f"  [in-season] Only {len(self._played)} matches — using prior only (need {min_matches_for_mle})")
+            self.blended_params = dict(self.prior_params)
+            return self
+
         all_teams = sorted(
             {m["home_team"] for m in self._played+self._remaining} |
             {m["away_team"] for m in self._played+self._remaining}

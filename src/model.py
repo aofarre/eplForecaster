@@ -589,32 +589,34 @@ class InSeasonForecaster:
               f" | alpha={self.alpha:.2f}"
               f" (current {self.alpha*100:.0f}%  prior/pedigree {(1-self.alpha)*100:.0f}%)")
 
+        # Determine current-season teams from fixtures (played + remaining)
+        current_teams = sorted(
+            {m["home_team"] for m in self._played + self._remaining} |
+            {m["away_team"] for m in self._played + self._remaining}
+        )
+
         if not self._played:
-            self.blended_params = dict(self.prior_params)
+            self.blended_params = {t: self.prior_params.get(t, TeamParams(t))
+                                   for t in current_teams}
             return self
 
-        # Don't attempt in-season MLE until we have at least 5 matches per team
-        # on average — with fewer data points the MLE is too noisy and can push
+        # Don't attempt in-season MLE until we have at least half a full matchday
+        # set — with fewer data points the MLE is too noisy and can push
         # promoted/lucky-start teams to absurd projected positions.
-        n_teams = len({m["home_team"] for m in self._played+self._remaining} |
-                      {m["away_team"] for m in self._played+self._remaining})
-        min_matches_for_mle = max(n_teams // 2, 5)   # ~half a full matchday set
+        min_matches_for_mle = max(len(current_teams) // 2, 5)
         if len(self._played) < min_matches_for_mle:
             print(f"  [in-season] Only {len(self._played)} matches — using prior only (need {min_matches_for_mle})")
-            self.blended_params = dict(self.prior_params)
+            self.blended_params = {t: self.prior_params.get(t, TeamParams(t))
+                                   for t in current_teams}
             return self
 
-        all_teams = sorted(
-            {m["home_team"] for m in self._played+self._remaining} |
-            {m["away_team"] for m in self._played+self._remaining}
-        )
         weights = _time_weights(self._played, self.xi)
         print(f"  Fitting current-season DC-MLE on {len(self._played)} matches ...")
         curr_params, curr_home_adv, _ = _fit_dc_mle(
-            self._played, weights, all_teams, initial_params=self.prior_params)
+            self._played, weights, current_teams, initial_params=self.prior_params)
 
         a = self.alpha
-        for team in all_teams:
+        for team in current_teams:
             pr = self.prior_params.get(team, TeamParams(team))
             cu = curr_params.get(team, TeamParams(team))
             self.blended_params[team] = TeamParams(

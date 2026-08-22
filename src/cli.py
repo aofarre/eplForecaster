@@ -37,31 +37,30 @@ PROMOTED_2026_27 = {
     "Hull":     "playoff",
 }
 
-# 2026/27 gross transfer spend (USD millions, money IN only) — used as fallback
-# when Transfermarkt squad value data is not yet available for the new season.
-# Gross spend (not net) reflects squad reinforcement without penalising clubs
-# that sold a superstar. Source: ESPN / Squawka, as of 22 Aug 2026.
+# 2026/27 squad market values (EUR millions, from Transfermarkt, Aug 2026).
+# Used as fallback when the CDN dataset hasn't yet updated for the new season.
+# These are total squad valuations — the correct signal for relative team strength.
 NET_SPEND_2026_27 = {
-    "Chelsea":        439.4,
-    "Arsenal":        270.6,
-    "Newcastle":      224.1,
-    "Man City":       204.3,
-    "Ipswich":        199.6,
-    "Aston Villa":    180.1,
-    "Tottenham":      302.9,   # gross = £302m even if net is lower after sales
-    "Liverpool":      118.1,
-    "Man United":     118.4,
-    "Brighton":       133.1,
-    "Coventry":       153.6,
-    "Fulham":         103.1,
-    "Hull":           110.2,
-    "Leeds":          107.4,
-    "Nottingham":      45.1,
-    "Everton":         77.6,
-    "Bournemouth":     71.0,
-    "Brentford":       89.8,
-    "Sunderland":      31.7,
-    "Crystal Palace":  42.2,
+    "Arsenal":        1450.0,
+    "Man City":       1360.0,
+    "Chelsea":        1350.0,
+    "Liverpool":       964.5,
+    "Man United":      874.3,
+    "Tottenham":       794.5,
+    "Brighton":        636.5,
+    "Newcastle":       586.3,
+    "Bournemouth":     565.9,
+    "Brentford":       561.8,
+    "Nottingham":      550.8,
+    "Crystal Palace":  545.4,
+    "Aston Villa":     521.3,
+    "Everton":         471.1,
+    "Leeds":           403.0,
+    "Sunderland":      398.6,
+    "Fulham":          348.8,
+    "Ipswich":         301.7,
+    "Coventry":        292.2,
+    "Hull":            144.3,
 }
 
 

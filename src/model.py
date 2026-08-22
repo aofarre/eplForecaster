@@ -71,7 +71,8 @@ BLEND_ALPHA_MAX = 0.80  # max current-season weight; pedigree floor = 20% (calib
 XI_PRIOR        = 0.002  # time-decay for prior-season MLE fitting (calibrated)
 XI_CURRENT      = 0.010  # time-decay for current-season MLE fitting (calibrated)
 
-TRANSFER_K = 0.10
+TRANSFER_K = 0.15  # log-scale adjustment per unit of log(squad_value/avg)
+               # Increased from 0.10 — transfer spending is a strong predictor
 
 # Promoted team attack/defence offsets from bottom-5 EPL average (log-scale).
 # Historically, no promoted team has finished top-4 in the modern CL era (since 2001).
@@ -431,11 +432,12 @@ class PreSeasonForecaster:
     """
 
     def __init__(self, season, promoted_teams=None, history_seasons=2,
-                 time_decay_xi=XI_PRIOR):
+                 time_decay_xi=XI_PRIOR, spend_values=None):
         self.season = season
         self.promoted_teams = promoted_teams or {}
         self.history_seasons = history_seasons
         self.xi = time_decay_xi
+        self.spend_values = spend_values  # optional {team: net_spend_eur} override
         self.team_params = {}
         self.home_advantage = HOME_ADVANTAGE_INIT
         self.rho = -0.1
@@ -475,21 +477,29 @@ class PreSeasonForecaster:
             offset = PROMOTED_OFFSET.get(route, PROMOTED_OFFSET["playoff"])
             self.team_params[team] = TeamParams(team, base_atk+offset, base_def+offset)
 
-        # Transfer value adjustment
+        # Transfer value adjustment — use squad values from DB, or spend_values override
         try:
             from fetch_transfers import get_squad_values
             values = get_squad_values(self.season)
-            if values:
-                avg = sum(values.values()) / len(values)
-                for team, p in self.team_params.items():
-                    if team in values and avg > 0:
-                        adj = TRANSFER_K * math.log(values[team] / avg)
-                        p.attack += adj; p.defence += adj
-                print(f"  Transfer adjustment applied for {len(values)} clubs.")
-            else:
-                print("  [transfers] No squad values -- run: python src/cli.py fetch-values")
-        except Exception as e:
-            print(f"  [transfers] Skipped: {e}")
+        except Exception:
+            values = {}
+
+        # Fall back to externally provided spend values if DB has nothing
+        if not values and self.spend_values:
+            values = self.spend_values
+            print(f"  Transfer adjustment using provided spend values ({len(values)} clubs).")
+        elif values:
+            print(f"  Transfer adjustment from Transfermarkt ({len(values)} clubs).")
+        else:
+            print("  [transfers] No squad values — run: python src/cli.py fetch-values")
+
+        if values:
+            avg = sum(values.values()) / len(values)
+            for team, p in self.team_params.items():
+                if team in values and avg > 0:
+                    adj = TRANSFER_K * math.log(max(values[team], 1) / avg)
+                    p.attack  += adj
+                    p.defence += adj
 
         # Cap promoted teams: they cannot be rated stronger than the Nth-best
         # returning side.  This prevents a single big win or stale transfer data

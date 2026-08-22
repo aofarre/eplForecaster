@@ -37,40 +37,31 @@ PROMOTED_2026_27 = {
     "Hull":     "playoff",
 }
 
-# 2026/27 net transfer spend (USD millions) — used as fallback when Transfermarkt
-# squad value data is not yet available for the new season.
-# Source: ESPN / Squawka, as of 22 Aug 2026.
-# Net spend reflects _change_ in squad quality, which is the signal we want.
-# Negative = net seller (squad potentially weakened).
-# We shift all values up by the largest negative so all values are positive
-# before taking log (required for the log-ratio adjustment).
-_RAW_NET_SPEND_2026_27_USD_M = {
-    "Chelsea":         241.8,
-    "Arsenal":         218.6,
-    "Ipswich":         179.0,
-    "Coventry":        153.6,
-    "Tottenham":        97.7,
-    "Hull":             95.7,
-    "Brentford":        89.8,
-    "Liverpool":        84.2,
-    "Fulham":           80.0,
-    "Everton":          77.6,
-    "Leeds":            73.7,
-    "Bournemouth":      64.2,
-    "Man United":       42.9,
-    "Brighton":          3.4,
-    "Man City":          2.6,
-    "Sunderland":       -1.5,
-    "Crystal Palace":  -33.0,
-    "Newcastle":       -88.4,
-    "Nottingham":     -119.9,
-    "Aston Villa":    -155.3,
-}
-# Shift so minimum → 1 (avoids log(0) and keeps all values positive)
-_min_spend = min(_RAW_NET_SPEND_2026_27_USD_M.values())
+# 2026/27 gross transfer spend (USD millions, money IN only) — used as fallback
+# when Transfermarkt squad value data is not yet available for the new season.
+# Gross spend (not net) reflects squad reinforcement without penalising clubs
+# that sold a superstar. Source: ESPN / Squawka, as of 22 Aug 2026.
 NET_SPEND_2026_27 = {
-    t: v - _min_spend + 1.0
-    for t, v in _RAW_NET_SPEND_2026_27_USD_M.items()
+    "Chelsea":        439.4,
+    "Arsenal":        270.6,
+    "Newcastle":      224.1,
+    "Man City":       204.3,
+    "Ipswich":        199.6,
+    "Aston Villa":    180.1,
+    "Tottenham":      302.9,   # gross = £302m even if net is lower after sales
+    "Liverpool":      118.1,
+    "Man United":     118.4,
+    "Brighton":       133.1,
+    "Coventry":       153.6,
+    "Fulham":         103.1,
+    "Hull":           110.2,
+    "Leeds":          107.4,
+    "Nottingham":      45.1,
+    "Everton":         77.6,
+    "Bournemouth":     71.0,
+    "Brentford":       89.8,
+    "Sunderland":      31.7,
+    "Crystal Palace":  42.2,
 }
 
 

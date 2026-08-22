@@ -66,8 +66,10 @@ from db import get_connection
 
 HOME_ADVANTAGE_INIT = 0.25
 
-BLEND_TAU       = 5.0   # matchdays for half-transition
-BLEND_ALPHA_MAX = 0.85  # permanent pedigree residual = 1 - 0.85 = 15 %
+BLEND_TAU       = 20.0  # matchdays for half-transition (calibrated via walk-forward CV)
+BLEND_ALPHA_MAX = 0.80  # max current-season weight; pedigree floor = 20% (calibrated)
+XI_PRIOR        = 0.002  # time-decay for prior-season MLE fitting (calibrated)
+XI_CURRENT      = 0.010  # time-decay for current-season MLE fitting (calibrated)
 
 TRANSFER_K = 0.10
 
@@ -407,7 +409,7 @@ class PreSeasonForecaster:
     """
 
     def __init__(self, season, promoted_teams=None, history_seasons=2,
-                 time_decay_xi=0.003):
+                 time_decay_xi=XI_PRIOR):
         self.season = season
         self.promoted_teams = promoted_teams or {}
         self.history_seasons = history_seasons
@@ -511,7 +513,7 @@ class InSeasonForecaster:
 
     def __init__(self, season, prior_params, prior_home_adv=HOME_ADVANTAGE_INIT,
                  blend_tau=BLEND_TAU, blend_alpha_max=BLEND_ALPHA_MAX,
-                 time_decay_xi=0.01):
+                 time_decay_xi=XI_CURRENT):
         self.season = season
         self.prior_params = prior_params
         self.prior_home_adv = prior_home_adv

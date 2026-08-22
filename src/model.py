@@ -71,8 +71,8 @@ BLEND_ALPHA_MAX = 0.80  # max current-season weight; pedigree floor = 20% (calib
 XI_PRIOR        = 0.002  # time-decay for prior-season MLE fitting (calibrated)
 XI_CURRENT      = 0.010  # time-decay for current-season MLE fitting (calibrated)
 
-TRANSFER_K = 0.15  # log-scale adjustment per unit of log(squad_value/avg)
-               # Increased from 0.10 — transfer spending is a strong predictor
+TRANSFER_K = 0.08  # log-scale adjustment per unit of log(squad_value/avg)
+               # Conservative — transfer spend is a weak within-season signal
 
 # Promoted team attack/defence offsets from bottom-5 EPL average (log-scale).
 # Historically, no promoted team has finished top-4 in the modern CL era (since 2001).

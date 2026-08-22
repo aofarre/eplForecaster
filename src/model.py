@@ -165,8 +165,6 @@ class ForecastResult:
         for r in self.summary():
             t = r["team"]
             s = st.get(t, {})
-            # Projected points: use median rank to scale from simulations
-            # More directly: sample points from the simulation
             team_idx = self.teams.index(t)
             rows.append({
                 "team":         t,
@@ -179,8 +177,9 @@ class ForecastResult:
                 "ga":           s.get("ga"),
                 "gd":           s.get("gd"),
                 "points":       s.get("points"),
-                # Forecast
-                "proj_rank":    round(r["median_rank"]),
+                # Forecast (proj_rank assigned after dedup below)
+                "_mean_rank":   float(np.mean(self.simulated_ranks[:, team_idx])),
+                "_points":      s.get("points") or 0,
                 "rank_p10":     round(r["p10_rank"]),
                 "rank_p90":     round(r["p90_rank"]),
                 "p_title":      round(r["p_title"] * 100, 1),
@@ -190,6 +189,21 @@ class ForecastResult:
                 ) * 100, 1),
                 "p_relegation": round(r["p_relegation"] * 100, 1),
             })
+
+        # Assign unique proj_rank 1–N with no ties.
+        # Primary sort: mean simulated rank (continuous, rarely identical).
+        # Tiebreaker: current points desc, then gd desc, then alphabetical.
+        rows.sort(key=lambda r: (
+            r["_mean_rank"],
+            -(r["_points"]),
+            -(r.get("gd") or 0),
+            r["team"],
+        ))
+        for pos, r in enumerate(rows, 1):
+            r["proj_rank"] = pos
+        # Clean up internal sort keys
+        for r in rows:
+            del r["_mean_rank"], r["_points"]
 
         return {
             "season":       self.season,

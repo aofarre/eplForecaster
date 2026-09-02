@@ -2,7 +2,7 @@
   "season": "2026/27",
   "matchday": 2.0,
   "blend_label": "Matchday 2 \u2014 8% current season + 92% prior",
-  "updated_at": "2026-09-01T12:31:01Z",
+  "updated_at": "2026-09-02T12:04:15Z",
   "teams": [
     {
       "team": "Arsenal",
@@ -16,9 +16,9 @@
       "points": 6,
       "rank_p10": 1,
       "rank_p90": 4,
-      "p_title": 58.2,
-      "p_top4": 94.4,
-      "p_top6": 98.2,
+      "p_title": 57.9,
+      "p_top4": 94.2,
+      "p_top6": 98.1,
       "p_relegation": 0.0,
       "proj_rank": 1
     },
@@ -34,9 +34,9 @@
       "points": 6,
       "rank_p10": 1,
       "rank_p90": 6,
-      "p_title": 21.9,
-      "p_top4": 77.6,
-      "p_top6": 90.4,
+      "p_title": 22.4,
+      "p_top4": 78.6,
+      "p_top6": 90.8,
       "p_relegation": 0.0,
       "proj_rank": 2
     },
@@ -52,9 +52,9 @@
       "points": 2,
       "rank_p10": 2,
       "rank_p90": 10,
-      "p_title": 6.9,
-      "p_top4": 50.6,
-      "p_top6": 71.0,
+      "p_title": 6.5,
+      "p_top4": 49.3,
+      "p_top6": 70.9,
       "p_relegation": 0.1,
       "proj_rank": 3
     },
@@ -71,9 +71,9 @@
       "rank_p10": 2,
       "rank_p90": 11,
       "p_title": 4.0,
-      "p_top4": 39.1,
-      "p_top6": 60.3,
-      "p_relegation": 0.2,
+      "p_top4": 39.0,
+      "p_top6": 61.0,
+      "p_relegation": 0.3,
       "proj_rank": 4
     },
     {
@@ -88,10 +88,10 @@
       "points": 6,
       "rank_p10": 3,
       "rank_p90": 12,
-      "p_title": 2.5,
-      "p_top4": 29.6,
-      "p_top6": 51.9,
-      "p_relegation": 0.3,
+      "p_title": 2.4,
+      "p_top4": 29.7,
+      "p_top6": 52.7,
+      "p_relegation": 0.4,
       "proj_rank": 5
     },
     {
@@ -106,10 +106,10 @@
       "points": 6,
       "rank_p10": 3,
       "rank_p90": 12,
-      "p_title": 2.5,
-      "p_top4": 29.4,
+      "p_title": 2.7,
+      "p_top4": 28.5,
       "p_top6": 49.7,
-      "p_relegation": 0.6,
+      "p_relegation": 0.3,
       "proj_rank": 6
     },
     {
@@ -124,9 +124,9 @@
       "points": 4,
       "rank_p10": 3,
       "rank_p90": 13,
-      "p_title": 1.8,
-      "p_top4": 24.7,
-      "p_top6": 46.2,
+      "p_title": 1.9,
+      "p_top4": 25.7,
+      "p_top6": 46.0,
       "p_relegation": 0.6,
       "proj_rank": 7
     },
@@ -142,10 +142,10 @@
       "points": 4,
       "rank_p10": 4,
       "rank_p90": 14,
-      "p_title": 0.5,
-      "p_top4": 13.2,
+      "p_title": 0.8,
+      "p_top4": 13.1,
       "p_top6": 28.8,
-      "p_relegation": 1.7,
+      "p_relegation": 1.6,
       "proj_rank": 8
     },
     {
@@ -161,9 +161,9 @@
       "rank_p10": 4,
       "rank_p90": 15,
       "p_title": 0.6,
-      "p_top4": 11.9,
-      "p_top6": 26.3,
-      "p_relegation": 1.7,
+      "p_top4": 12.3,
+      "p_top6": 25.9,
+      "p_relegation": 2.1,
       "proj_rank": 9
     },
     {
@@ -178,10 +178,10 @@
       "points": 1,
       "rank_p10": 4,
       "rank_p90": 15,
-      "p_title": 0.6,
-      "p_top4": 11.3,
-      "p_top6": 26.1,
-      "p_relegation": 2.1,
+      "p_title": 0.3,
+      "p_top4": 11.2,
+      "p_top6": 25.2,
+      "p_relegation": 1.9,
       "proj_rank": 10
     },
     {
@@ -197,28 +197,10 @@
       "rank_p10": 5,
       "rank_p90": 16,
       "p_title": 0.2,
-      "p_top4": 6.2,
-      "p_top6": 15.8,
-      "p_relegation": 4.3,
+      "p_top4": 6.6,
+      "p_top6": 16.0,
+      "p_relegation": 4.0,
       "proj_rank": 11
-    },
-    {
-      "team": "Ipswich Town",
-      "played": 2,
-      "won": 1,
-      "drawn": 0,
-      "lost": 1,
-      "gf": 4,
-      "ga": 6,
-      "gd": -2,
-      "points": 3,
-      "rank_p10": 6,
-      "rank_p90": 17,
-      "p_title": 0.1,
-      "p_top4": 4.2,
-      "p_top6": 11.5,
-      "p_relegation": 6.8,
-      "proj_rank": 12
     },
     {
       "team": "Bournemouth",
@@ -234,8 +216,26 @@
       "rank_p90": 17,
       "p_title": 0.1,
       "p_top4": 4.1,
-      "p_top6": 11.3,
-      "p_relegation": 6.9,
+      "p_top6": 11.5,
+      "p_relegation": 6.0,
+      "proj_rank": 12
+    },
+    {
+      "team": "Ipswich Town",
+      "played": 2,
+      "won": 1,
+      "drawn": 0,
+      "lost": 1,
+      "gf": 4,
+      "ga": 6,
+      "gd": -2,
+      "points": 3,
+      "rank_p10": 6,
+      "rank_p90": 17,
+      "p_title": 0.1,
+      "p_top4": 4.3,
+      "p_top6": 11.4,
+      "p_relegation": 6.5,
       "proj_rank": 13
     },
     {
@@ -252,8 +252,8 @@
       "rank_p90": 17,
       "p_title": 0.1,
       "p_top4": 2.5,
-      "p_top6": 7.6,
-      "p_relegation": 9.2,
+      "p_top6": 7.5,
+      "p_relegation": 8.6,
       "proj_rank": 14
     },
     {
@@ -269,9 +269,9 @@
       "rank_p10": 10,
       "rank_p90": 19,
       "p_title": 0.0,
-      "p_top4": 0.6,
-      "p_top6": 2.1,
-      "p_relegation": 23.9,
+      "p_top4": 0.5,
+      "p_top6": 2.2,
+      "p_relegation": 24.3,
       "proj_rank": 15
     },
     {
@@ -287,9 +287,9 @@
       "rank_p10": 12,
       "rank_p90": 20,
       "p_title": 0.0,
-      "p_top4": 0.2,
-      "p_top6": 0.9,
-      "p_relegation": 40.2,
+      "p_top4": 0.1,
+      "p_top6": 0.7,
+      "p_relegation": 39.5,
       "proj_rank": 16
     },
     {
@@ -306,8 +306,8 @@
       "rank_p90": 20,
       "p_title": 0.0,
       "p_top4": 0.1,
-      "p_top6": 0.6,
-      "p_relegation": 42.9,
+      "p_top6": 0.8,
+      "p_relegation": 43.3,
       "proj_rank": 17
     },
     {
@@ -324,8 +324,8 @@
       "rank_p90": 20,
       "p_title": 0.0,
       "p_top4": 0.1,
-      "p_top6": 0.5,
-      "p_relegation": 46.2,
+      "p_top6": 0.4,
+      "p_relegation": 47.5,
       "proj_rank": 18
     },
     {
@@ -360,8 +360,8 @@
       "rank_p90": 20,
       "p_title": 0.0,
       "p_top4": 0.0,
-      "p_top6": 0.1,
-      "p_relegation": 63.8,
+      "p_top6": 0.2,
+      "p_relegation": 64.6,
       "proj_rank": 20
     }
   ]

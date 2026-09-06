@@ -2,10 +2,13 @@ name: Update EPL Forecast
 
 on:
   schedule:
-    # Refresh every six hours during the EPL season (Aug–May).
-    # This makes the static site reasonably current while making only four
-    # score API requests per day, comfortably below the provider's limits.
-    - cron: "0 0,6,12,18 * 8-12,1-5 *"
+    # Eastern Standard Time: 09:30, 12:00, 14:30, and 17:30.
+    # GitHub Actions schedules use UTC; these become one hour earlier during EDT.
+    # Four automated score API requests daily remain comfortably within limits.
+    - cron: "30 14 * 8-12,1-5 *"
+    - cron: "0 17 * 8-12,1-5 *"
+    - cron: "30 19 * 8-12,1-5 *"
+    - cron: "30 22 * 8-12,1-5 *"
   workflow_dispatch:
     inputs:
       sims:

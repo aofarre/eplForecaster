@@ -51,6 +51,14 @@ python src/cli.py standings
 
 Set `FOOTBALL_DATA_API_KEY` env var for richer fixture data (free tier at [football-data.org](https://www.football-data.org/)).
 
+## Refreshing the live site
+
+The forecast refreshes automatically at **09:30, 12:00, 14:30, and 17:30 EST**
+during the EPL season (one hour earlier during daylight saving time, because GitHub
+Actions schedules use UTC).
+
+To refresh on demand, open **[Run the update workflow](https://github.com/aofarre/eplForecaster/actions/workflows/update.yml)**, select **Run workflow**, and click **Run workflow** again. The site updates when that run completes. One or two manual refreshes per day, in addition to the scheduled runs, remains well within the score API limit.
+
 ## Data sources
 
 - Match results: [football-data.co.uk](https://www.football-data.co.uk) (historical) + [football-data.org](https://www.football-data.org) / [OpenFootball](https://github.com/openfootball/football.json) (live)

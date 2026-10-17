@@ -2,7 +2,7 @@
   "season": "2026/27",
   "matchday": 7.0,
   "blend_label": "Matchday 7 \u2014 24% current season + 76% prior",
-  "updated_at": "2026-10-17T19:04:10Z",
+  "updated_at": "2026-10-17T21:37:54Z",
   "teams": [
     {
       "team": "Arsenal",
@@ -17,8 +17,8 @@
       "rank_p10": 1,
       "rank_p90": 3,
       "p_title": 45.8,
-      "p_top4": 98.2,
-      "p_top6": 99.8,
+      "p_top4": 98.3,
+      "p_top6": 99.9,
       "p_relegation": 0.0,
       "proj_rank": 1
     },
@@ -34,9 +34,9 @@
       "points": 21,
       "rank_p10": 1,
       "rank_p90": 3,
-      "p_title": 42.8,
+      "p_title": 42.6,
       "p_top4": 98.0,
-      "p_top6": 99.8,
+      "p_top6": 99.7,
       "p_relegation": 0.0,
       "proj_rank": 2
     },
@@ -52,9 +52,9 @@
       "points": 13,
       "rank_p10": 2,
       "rank_p90": 5,
-      "p_title": 8.1,
-      "p_top4": 83.1,
-      "p_top6": 96.1,
+      "p_title": 8.2,
+      "p_top4": 82.1,
+      "p_top6": 95.5,
       "p_relegation": 0.0,
       "proj_rank": 3
     },
@@ -70,10 +70,10 @@
       "points": 13,
       "rank_p10": 2,
       "rank_p90": 7,
-      "p_title": 2.7,
-      "p_top4": 62.1,
-      "p_top6": 86.8,
-      "p_relegation": 0.0,
+      "p_title": 3.0,
+      "p_top4": 62.6,
+      "p_top6": 87.4,
+      "p_relegation": 0.1,
       "proj_rank": 4
     },
     {
@@ -88,9 +88,9 @@
       "points": 12,
       "rank_p10": 4,
       "rank_p90": 11,
-      "p_title": 0.3,
+      "p_title": 0.2,
       "p_top4": 21.5,
-      "p_top6": 55.8,
+      "p_top6": 55.6,
       "p_relegation": 0.4,
       "proj_rank": 5
     },
@@ -106,9 +106,9 @@
       "points": 9,
       "rank_p10": 4,
       "rank_p90": 12,
-      "p_title": 0.2,
-      "p_top4": 13.9,
-      "p_top6": 43.3,
+      "p_title": 0.1,
+      "p_top4": 13.7,
+      "p_top6": 43.5,
       "p_relegation": 0.9,
       "proj_rank": 6
     },
@@ -124,10 +124,10 @@
       "points": 10,
       "rank_p10": 5,
       "rank_p90": 14,
-      "p_title": 0.0,
-      "p_top4": 7.6,
-      "p_top6": 29.8,
-      "p_relegation": 2.0,
+      "p_title": 0.1,
+      "p_top4": 8.2,
+      "p_top6": 30.0,
+      "p_relegation": 2.1,
       "proj_rank": 7
     },
     {
@@ -143,9 +143,9 @@
       "rank_p10": 6,
       "rank_p90": 16,
       "p_title": 0.0,
-      "p_top4": 3.8,
-      "p_top6": 17.4,
-      "p_relegation": 5.7,
+      "p_top4": 3.6,
+      "p_top6": 17.6,
+      "p_relegation": 5.4,
       "proj_rank": 8
     },
     {
@@ -161,9 +161,9 @@
       "rank_p10": 6,
       "rank_p90": 16,
       "p_title": 0.0,
-      "p_top4": 2.6,
-      "p_top6": 15.1,
-      "p_relegation": 5.1,
+      "p_top4": 2.7,
+      "p_top6": 14.5,
+      "p_relegation": 5.8,
       "proj_rank": 9
     },
     {
@@ -180,8 +180,8 @@
       "rank_p90": 17,
       "p_title": 0.0,
       "p_top4": 2.9,
-      "p_top6": 14.0,
-      "p_relegation": 6.3,
+      "p_top6": 14.7,
+      "p_relegation": 6.8,
       "proj_rank": 10
     },
     {
@@ -197,9 +197,9 @@
       "rank_p10": 7,
       "rank_p90": 17,
       "p_title": 0.0,
-      "p_top4": 1.7,
-      "p_top6": 9.5,
-      "p_relegation": 9.9,
+      "p_top4": 1.6,
+      "p_top6": 9.7,
+      "p_relegation": 9.5,
       "proj_rank": 11
     },
     {
@@ -215,9 +215,9 @@
       "rank_p10": 7,
       "rank_p90": 18,
       "p_title": 0.0,
-      "p_top4": 1.5,
-      "p_top6": 9.7,
-      "p_relegation": 10.1,
+      "p_top4": 1.8,
+      "p_top6": 9.9,
+      "p_relegation": 10.4,
       "proj_rank": 12
     },
     {
@@ -233,9 +233,9 @@
       "rank_p10": 7,
       "rank_p90": 18,
       "p_title": 0.0,
-      "p_top4": 1.1,
-      "p_top6": 7.7,
-      "p_relegation": 11.2,
+      "p_top4": 1.0,
+      "p_top6": 6.7,
+      "p_relegation": 11.4,
       "proj_rank": 13
     },
     {
@@ -248,12 +248,12 @@
       "ga": 12,
       "gd": -3,
       "points": 7,
-      "rank_p10": 8,
+      "rank_p10": 9,
       "rank_p90": 19,
       "p_title": 0.0,
-      "p_top4": 0.5,
-      "p_top6": 3.5,
-      "p_relegation": 23.4,
+      "p_top4": 0.4,
+      "p_top6": 3.3,
+      "p_relegation": 22.8,
       "proj_rank": 14
     },
     {
@@ -269,9 +269,9 @@
       "rank_p10": 9,
       "rank_p90": 19,
       "p_title": 0.0,
-      "p_top4": 0.2,
-      "p_top6": 3.0,
-      "p_relegation": 25.5,
+      "p_top4": 0.3,
+      "p_top6": 2.8,
+      "p_relegation": 25.9,
       "proj_rank": 15
     },
     {
@@ -287,9 +287,9 @@
       "rank_p10": 9,
       "rank_p90": 19,
       "p_title": 0.0,
-      "p_top4": 0.4,
-      "p_top6": 2.6,
-      "p_relegation": 27.3,
+      "p_top4": 0.3,
+      "p_top6": 2.7,
+      "p_relegation": 26.6,
       "proj_rank": 16
     },
     {
@@ -305,9 +305,9 @@
       "rank_p10": 9,
       "rank_p90": 19,
       "p_title": 0.0,
-      "p_top4": 0.3,
-      "p_top6": 2.5,
-      "p_relegation": 28.3,
+      "p_top4": 0.4,
+      "p_top6": 2.7,
+      "p_relegation": 28.6,
       "proj_rank": 17
     },
     {
@@ -324,8 +324,8 @@
       "rank_p90": 19,
       "p_title": 0.0,
       "p_top4": 0.3,
-      "p_top6": 2.5,
-      "p_relegation": 28.3,
+      "p_top6": 2.6,
+      "p_relegation": 28.9,
       "proj_rank": 18
     },
     {
@@ -342,8 +342,8 @@
       "rank_p90": 20,
       "p_title": 0.0,
       "p_top4": 0.1,
-      "p_top6": 0.9,
-      "p_relegation": 43.9,
+      "p_top6": 0.8,
+      "p_relegation": 43.5,
       "proj_rank": 19
     },
     {
@@ -356,12 +356,12 @@
       "ga": 9,
       "gd": -6,
       "points": 3,
-      "rank_p10": 15,
+      "rank_p10": 14,
       "rank_p90": 20,
       "p_title": 0.0,
       "p_top4": 0.0,
       "p_top6": 0.1,
-      "p_relegation": 71.7,
+      "p_relegation": 70.9,
       "proj_rank": 20
     }
   ]

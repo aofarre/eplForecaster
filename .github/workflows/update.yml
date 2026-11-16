@@ -9,6 +9,9 @@ on:
     - cron: "0 17 * 8-12,1-5 *"
     - cron: "30 19 * 8-12,1-5 *"
     - cron: "30 22 * 8-12,1-5 *"
+    # One of these is 18:00 in America/New_York; the guard skips the other.
+    - cron: "0 22 * * 1"
+    - cron: "0 23 * * 1"
   workflow_dispatch:
     inputs:
       sims:
@@ -20,12 +23,45 @@ permissions:
   contents: write
 
 jobs:
+  schedule:
+    runs-on: ubuntu-latest
+    outputs:
+      run_forecast: ${{ steps.guard.outputs.run_forecast }}
+      snapshot_date: ${{ steps.guard.outputs.snapshot_date }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'schedule' && github.event.repository.default_branch || github.ref }}
+      - name: Check weekly snapshot schedule
+        id: guard
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          SCHEDULE: ${{ github.event.schedule }}
+        run: |
+          snapshot_date=""
+          run_forecast=true
+          if [[ "$EVENT_NAME" == "schedule" && ( "$SCHEDULE" == "0 22 * * 1" || "$SCHEDULE" == "0 23 * * 1" ) ]]; then
+            snapshot_date=$(python3 src/snapshots.py check --schedule "$SCHEDULE")
+            if [[ -z "$snapshot_date" ]]; then
+              run_forecast=false
+            fi
+          fi
+          echo "run_forecast=$run_forecast" >> "$GITHUB_OUTPUT"
+          echo "snapshot_date=$snapshot_date" >> "$GITHUB_OUTPUT"
+
   forecast:
+    needs: schedule
+    if: needs.schedule.outputs.run_forecast == 'true'
+    concurrency:
+      group: epl-forecast-update-${{ github.ref }}
+      cancel-in-progress: false
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'schedule' && github.event.repository.default_branch || github.ref }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -68,11 +104,17 @@ jobs:
           SIMS=${{ github.event.inputs.sims || '10000' }}
           python cli.py forecast --sims $SIMS --output ../docs/data.json
 
+      - name: Archive weekly snapshot
+        if: needs.schedule.outputs.snapshot_date != ''
+        env:
+          SNAPSHOT_DATE: ${{ needs.schedule.outputs.snapshot_date }}
+        run: python src/snapshots.py save --date "$SNAPSHOT_DATE"
+
       - name: Commit updated forecast
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/data.json
+          git add docs/data.json docs/snapshots
           # Only commit if something changed
           git diff --cached --quiet || \
             git commit -m "chore: update forecast $(date -u +%Y-%m-%dT%H:%M:%SZ)

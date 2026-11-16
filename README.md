@@ -59,6 +59,28 @@ Actions schedules use UTC).
 
 To refresh on demand, open **[Run the update workflow](https://github.com/aofarre/eplForecaster/actions/workflows/update.yml)**, select **Run workflow**, and click **Run workflow** again. The site updates when that run completes. One or two manual refreshes per day, in addition to the scheduled runs, remains well within the score API limit.
 
+### Weekly projection history
+
+The projection dropdown defaults to the current forecast. Choose an earlier Monday
+to see that week's forecast and standings as they were captured. History begins
+when this feature is deployed; earlier forecasts cannot be reconstructed from
+the current data.
+
+Every Monday, year-round, the workflow triggers at both 22:00 and 23:00 UTC.
+A timezone-aware guard runs the forecast only for the trigger corresponding to
+**6:00 pm America/New_York** (22:00 UTC during daylight saving time, 23:00 UTC
+otherwise). The other trigger stops before downloading data or running the model.
+The eligible run syncs results, generates a fresh forecast, and saves it in
+`docs/snapshots/YYYY-MM-DD.json` with an entry in `docs/snapshots/index.json`.
+The scheduled time is shown in the selector; the actual capture and forecast
+update times are shown when viewing a snapshot. GitHub Actions can start late,
+and data fetching and simulation take time, so capture is not instantaneous.
+If the eligible trigger starts after midnight New York time, is dropped, or fails,
+that week's snapshot is missed rather than being backdated. Existing snapshots
+are never overwritten by a rerun; manual refreshes update only the current forecast.
+Archive files and the index are committed with the live forecast and served by
+GitHub Pages.
+
 ## Data sources
 
 - Match results: [football-data.co.uk](https://www.football-data.co.uk) (historical) + [football-data.org](https://www.football-data.org) / [OpenFootball](https://github.com/openfootball/football.json) (live)

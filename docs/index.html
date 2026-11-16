@@ -42,6 +42,24 @@
       color: #8b949e;
     }
     .meta strong { color: #c9d1d9; }
+    .projection-picker {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+      font-size: 0.875rem;
+    }
+    .projection-picker select {
+      max-width: 100%;
+      padding: 6px 8px;
+      color: #e6edf3;
+      background: #161b22;
+      border: 1px solid #484f58;
+      border-radius: 6px;
+      font: inherit;
+    }
+    .picker-status { margin-top: 6px; color: #f85149; font-size: 0.8rem; }
 
     /* Zone legend */
     .legend {
@@ -189,6 +207,14 @@
 <header>
   <h1>⚽ EPL Forecaster <span class="badge" id="season-badge">2026/27</span></h1>
   <p class="meta" id="meta-line">Loading…</p>
+  <div class="projection-picker">
+    <label for="projection-select">Projection</label>
+    <select id="projection-select" disabled>
+      <option value="data.json">Current projection</option>
+    </select>
+  </div>
+  <p class="picker-status" id="archive-status" role="status"></p>
+  <p class="picker-status" id="forecast-status" role="status"></p>
 </header>
 
 <div class="legend">
@@ -233,11 +259,19 @@
 
 <script>
 const DATA_URL = "data.json";
+const INDEX_URL = "snapshots/index.json";
+const easternTime = new Intl.DateTimeFormat("en-US", {
+  timeZone: "America/New_York",
+  dateStyle: "medium",
+  timeStyle: "short",
+});
 
 // Sort state
 let sortCol = "proj_rank";
 let sortDir = 1;   // 1 = asc, -1 = desc
 let allTeams = [];
+let snapshots = [];
+let displayedUrl = DATA_URL;
 
 function zone(projRank) {
   if (projRank <= 4)  return "ucl";
@@ -329,47 +363,82 @@ function renderTable() {
   });
 }
 
-async function load() {
+async function loadForecast(url) {
+  const select = document.getElementById("projection-select");
+  const status = document.getElementById("forecast-status");
+  select.disabled = true;
+  status.textContent = "";
   try {
-    const resp = await fetch(DATA_URL + "?_=" + Date.now());
-    if (!resp.ok) throw new Error(resp.statusText);
+    const resp = await fetch(url + "?_=" + Date.now());
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     const data = await resp.json();
+    if (!Array.isArray(data.teams)) throw new Error("Invalid forecast data");
 
     document.getElementById("season-badge").textContent = data.season || "2026/27";
-    document.getElementById("meta-line").innerHTML =
-      `<strong>${data.blend_label}</strong> &nbsp;·&nbsp; Updated ${formatAge(data.updated_at)}`;
+    const meta = document.getElementById("meta-line");
+    const label = document.createElement("strong");
+    label.textContent = data.blend_label;
+    const snapshot = snapshots.find(item => item.path === url);
+    const updated = snapshot
+      ? `Archived ${easternTime.format(new Date(snapshot.captured_at))} New York time · Forecast updated ${easternTime.format(new Date(data.updated_at))} New York time`
+      : `Updated ${formatAge(data.updated_at)}`;
+    meta.replaceChildren(label, document.createTextNode(` · ${updated}`));
 
-    allTeams = data.teams || [];
+    allTeams = data.teams;
+    displayedUrl = url;
 
     document.getElementById("loading").style.display = "none";
     document.getElementById("main-table").style.display = "table";
 
     renderTable();
-
-    // Wire up sortable headers
-    document.querySelectorAll("thead th.sortable").forEach(th => {
-      th.addEventListener("click", () => {
-        const col = th.dataset.col;
-        if (sortCol === col) {
-          sortDir *= -1;
-        } else {
-          sortCol = col;
-          // Probabilities and wins/pts: default desc (highest first)
-          // Rank, lost: default asc (lowest first)
-          const ascDefault = ["proj_rank", "lost", "team"].includes(col);
-          sortDir = ascDefault ? 1 : -1;
-        }
-        renderTable();
-      });
-    });
-
   } catch (e) {
-    document.getElementById("loading").innerHTML =
-      `<div class="error">⚠ Could not load forecast data.<br><small>${e.message}</small></div>`;
+    select.value = displayedUrl;
+    status.textContent = `Could not load projection: ${e.message}`;
+    if (document.getElementById("main-table").style.display === "none") {
+      document.getElementById("loading").textContent = "Could not load forecast data.";
+    }
+  } finally {
+    select.disabled = false;
   }
 }
 
-load();
+async function loadIndex() {
+  try {
+    const resp = await fetch(INDEX_URL + "?_=" + Date.now());
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const entries = await resp.json();
+    if (!Array.isArray(entries)) throw new Error("Invalid snapshot index");
+    const select = document.getElementById("projection-select");
+    for (const entry of entries) {
+      const option = document.createElement("option");
+      option.value = entry.path;
+      option.textContent = `${easternTime.format(new Date(entry.scheduled_at))} New York time · ${entry.season}`;
+      select.appendChild(option);
+    }
+    snapshots = entries;
+  } catch (e) {
+    document.getElementById("archive-status").textContent = `Could not load projection history: ${e.message}`;
+  }
+}
+
+document.getElementById("projection-select").addEventListener("change", event => {
+  loadForecast(event.target.value);
+});
+document.querySelectorAll("thead th.sortable").forEach(th => {
+  th.addEventListener("click", () => {
+    const col = th.dataset.col;
+    if (sortCol === col) {
+      sortDir *= -1;
+    } else {
+      sortCol = col;
+      const ascDefault = ["proj_rank", "lost", "team"].includes(col);
+      sortDir = ascDefault ? 1 : -1;
+    }
+    renderTable();
+  });
+});
+loadForecast(DATA_URL);
+loadIndex();
 </script>
 </body>
 </html>
